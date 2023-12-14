@@ -1,7 +1,9 @@
-const { User } = require("../../models");
+const { User, sequelize } = require("../../models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const roles = require("../../utils/roles");
 const { JWT_SECRET_KEY } = process.env;
+const crypto = require("crypto");
 
 module.exports = {
   register: async (req, res, next) => {
@@ -11,7 +13,7 @@ module.exports = {
         email,
         password,
         confirmPassword,
-        role = "User",
+        role = roles.student,
       } = req.body;
 
       const exist = await User.findOne({ where: { email } });
@@ -27,6 +29,8 @@ module.exports = {
           message: "password and confirm password doesn\t match!!!",
         });
 
+      const code = crypto.randomBytes(2).toString("hex");
+
       const hashPassword = await bcrypt.hash(password, 10);
       const user = await User.create({
         username,
@@ -34,6 +38,7 @@ module.exports = {
         password: hashPassword,
         confirm_password: confirmPassword,
         role,
+        code,
       });
 
       return res.status(201).json({
@@ -44,6 +49,7 @@ module.exports = {
           username: user.username,
           email: user.email,
           role: user.role,
+          code: user.code,
         },
       });
     } catch (err) {
@@ -76,7 +82,7 @@ module.exports = {
           role: exist.role,
         },
         JWT_SECRET_KEY,
-        { expiresIn: "2h" }
+        { expiresIn: "4h" }
       );
 
       return res.status(200).json({
@@ -88,6 +94,80 @@ module.exports = {
           email: exist.email,
           role: exist.role,
           token,
+        },
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  getAllStudent: async (req, res, next) => {
+    try {
+      // const user = await User.findAll({ where: { role: roles.student } });
+      const user = await sequelize.query(
+        `SELECT * FROM users WHERE role = 'student' ORDER BY id DESC`,
+        { type: sequelize.QueryTypes.SELECT }
+      );
+      return res.status(200).json({
+        status: true,
+        message: "success get all user data",
+        data: user,
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  // getStudentById: async (req, res, next) => {
+  //   try {
+  //     const { id } = req.params;
+  //     const user = await User.findOne({ where: { id } });
+  //     return res.status(200).json({
+  //       status: true,
+  //       message: "success get user data",
+  //       data: {
+  //         id: user.id,
+  //         username: user.username,
+  //         email: user.email,
+  //         role: user.role,
+  //       },
+  //     });
+  //   } catch (err) {
+  //     next(err);
+  //   }
+  // },
+
+  // getAllStudent: async (req, res, next) => {
+  //   try {
+  //     const user = await User.findAll();
+  //     return res.status(200).json({
+  //       status: true,
+  //       message: "success get all user data",
+  //       data: user,
+  //     });
+  //   } catch (err) {
+  //     next(err);
+  //   }
+  // },
+
+  myProfile: async (req, res, next) => {
+    try {
+      const id = req.user.id;
+      const user = await User.findOne({ where: { id } });
+      if (!user) {
+        return res.status(400).json({
+          status: false,
+          message: "user not found",
+        });
+      }
+      return res.status(200).json({
+        status: true,
+        message: "success get student profile data",
+        data: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          role: user.role,
         },
       });
     } catch (err) {
