@@ -20,7 +20,6 @@ module.exports = {
           status: false,
           message: "e-mail already in use!!!",
         });
-
       if (password != confirmPassword)
         return res.status(400).json({
           status: false,
