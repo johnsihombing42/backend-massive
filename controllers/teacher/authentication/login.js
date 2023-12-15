@@ -1,44 +1,39 @@
+const { Teacher } = require("../../../models");
 const bcrypt = require("bcrypt");
-const query = require("../../../database/query");
 const jwt = require("jsonwebtoken");
-
+const { JWT_SECRET_KEY } = process.env;
 module.exports = {
   login: async (req, res, next) => {
+    const { email, password } = req.body;
     try {
-      const { username, password } = req.body;
-      const isExist = `SELECT * FROM teachers WHERE username = ?`;
-      const [exist] = await query(isExist, [username]);
+      const exist = await Teacher.findOne({ where: { email } });
       if (!exist) {
         return res.status(400).json({
           status: false,
-          message: "username not found!!!",
+          message: "email or password is wrong!!!",
         });
       }
-      const isMatch = await bcrypt.compare(password, exist.password);
-      if (!isMatch) {
+      const validPass = await bcrypt.compare(password, exist.password);
+      if (!validPass) {
         return res.status(400).json({
           status: false,
-          message: "password doesn't match!!!",
+          message: "email or password is wrong!!!",
         });
       }
       const token = jwt.sign(
         {
           id: exist.id,
-          username: exist.username,
           email: exist.email,
           role: exist.role,
         },
-        process.env.JWT_SECRET_KEY,
-        {
-          expiresIn: "1d",
-        }
+        JWT_SECRET_KEY,
+        { expiresIn: "4h" }
       );
       return res.status(200).json({
         status: true,
         message: "login successfully",
         data: {
           id: exist.id,
-          username: exist.username,
           email: exist.email,
           role: exist.role,
           token,
