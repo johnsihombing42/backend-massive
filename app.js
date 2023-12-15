@@ -7,7 +7,7 @@ const bodyParser = require("body-parser");
 const path = require("path");
 const cors = require("cors");
 
-const { HTTP_PORT } = process.env;
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(morgan("dev"));
@@ -26,8 +26,9 @@ app.use((req, res, next) => {
   });
 });
 
-app.listen(HTTP_PORT, () => console.log("listening on port", HTTP_PORT));
-
+app.listen(PORT, "0.0.0.0", function () {
+  console.log(`Server is running on PORT ${PORT}`);
+});
 //1.Buat model
 // npx sequelize-cli model:generate --name User --attributes name:string,email:string,password:string,confirmPassword:string,role:string
 // npx sequelize-cli model:generate --name Parent  --attributes user_id:integer,name:string,email:string,password:string,confirmPassword:string,role:string
