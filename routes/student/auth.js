@@ -11,8 +11,8 @@ const roles = require("../../utils/roles");
 // router.get("/v1/student/all", middle(roles.student), cont1.auth.getAllStudent);
 router.post("/v2/student/register", cont.register.register);
 router.post("/v2/student/login", cont.login.login);
-// router.get("/v2/student/", middle(roles.student), cont.me.getMyProfile);
-// router.post("/v2/student/reset-password", cont.resetPassword.resetPassword);
+router.get("/v2/student/", middle(roles.student), cont.me.getProfile);
+router.post("/v2/student/reset-password", cont.resetPassword.resetPassword);
 // router.post("/v2/student/update-password", cont.updatePassword.updatePassword);
 
 module.exports = router;

@@ -1,12 +1,11 @@
-const query = require("../../../database/query");
+const { User } = require("../../../models");
 const jwt = require("jsonwebtoken");
 
 module.exports = {
   resetPassword: async (req, res, next) => {
     try {
       const { email } = req.body;
-      const isExist = `SELECT * FROM users WHERE email = ?`;
-      const [exist] = await query(isExist, [email]);
+      const exist = await User.findOne({ where: { email } });
       if (!exist) {
         return res.status(400).json({
           status: false,
@@ -47,7 +46,7 @@ module.exports = {
       });
       return res.status(200).json({
         status: true,
-        message: "success send email",
+        message: "success send email to " + email + " to reset password",
       });
     } catch {}
   },
