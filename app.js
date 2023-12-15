@@ -29,7 +29,8 @@ app.use((req, res, next) => {
 app.listen(HTTP_PORT, () => console.log("listening on port", HTTP_PORT));
 
 //1.Buat model
-// npx sequelize-cli model:generate --name  --attributes name:string,email:string,password:string,confirmPassworUserd:string,role:string
-
+// npx sequelize-cli model:generate --name User --attributes name:string,email:string,password:string,confirmPassword:string,role:string
+// npx sequelize-cli model:generate --name Parent  --attributes user_id:integer,name:string,email:string,password:string,confirmPassword:string,role:string
+// npx sequelize-cli model:generate --name Teacher --attributes username:string,email:string,password:string,confirmPassword:string,phone:string,role:string
 //2.Migrate mode
 // sequelize-cli db:migrate
