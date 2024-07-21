@@ -15,3 +15,4 @@ const express = require("express");
 // router.get("/v2/parent/", middle(roles.parent), cont.me.getMyProfile);
 // router.get("/v2/parent/data", cont.getAllParent.getAllParent);
 // module.exports = router;
+//
